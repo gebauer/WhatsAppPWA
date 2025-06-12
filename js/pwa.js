@@ -14,7 +14,9 @@ export class PWA {
   async registerServiceWorker() {
     if ('serviceWorker' in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register('/sw.js');
+        const registration = await navigator.serviceWorker.register('./sw.js', {
+          scope: './'
+        });
         console.log('ServiceWorker registration successful');
       } catch (err) {
         console.error('ServiceWorker registration failed:', err);
@@ -26,20 +28,24 @@ export class PWA {
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       this.deferredPrompt = e;
-      this.installPrompt.style.display = 'block';
-    });
-
-    this.installPrompt.addEventListener('click', async () => {
-      if (this.deferredPrompt) {
-        this.deferredPrompt.prompt();
-        const { outcome } = await this.deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          console.log('User accepted the install prompt');
-        }
-        this.deferredPrompt = null;
-        this.installPrompt.style.display = 'none';
+      if (this.installPrompt) {
+        this.installPrompt.style.display = 'block';
       }
     });
+
+    if (this.installPrompt) {
+      this.installPrompt.addEventListener('click', async () => {
+        if (this.deferredPrompt) {
+          this.deferredPrompt.prompt();
+          const { outcome } = await this.deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          }
+          this.deferredPrompt = null;
+          this.installPrompt.style.display = 'none';
+        }
+      });
+    }
   }
 
   setupUpdateCheck() {

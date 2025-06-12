@@ -1,58 +1,61 @@
-const CACHE_NAME = 'wa-cache-v1';
-const ASSETS = [
-  '.',
-  'index.html',
-  'manifest.json',
-  'icon.png'
+const CACHE_NAME = 'whatsapp-link-generator-v1';
+const ASSETS_TO_CACHE = [
+  './',
+  './index.html',
+  './styles.css',
+  './js/app.js',
+  './js/settings.js',
+  './js/i18n.js',
+  './js/pwa.js',
+  './manifest.json',
+  './icons/icon-192x192.png',
+  './icons/icon-512x512.png',
+  './favicon.ico'
 ];
 
-// Installation
-self.addEventListener('install', event => {
+// Install event - cache assets
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS))
-      .then(() => self.skipWaiting())
+      .then((cache) => {
+        return cache.addAll(ASSETS_TO_CACHE);
+      })
   );
 });
 
-// Activation and cleanup old caches
-self.addEventListener('activate', event => {
+// Activate event - clean up old caches
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map(cacheName => {
+        cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
         })
       );
-    }).then(() => self.clients.claim())
+    })
   );
 });
 
-// Fetch strategy: Cache First, falling back to network
-self.addEventListener('fetch', event => {
+// Fetch event - serve from cache, fall back to network
+self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
-      .then(response => {
+      .then((response) => {
         if (response) {
-          return response; // Return cached version
+          return response;
         }
         return fetch(event.request)
-          .then(response => {
-            // Check if we received a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
+          .then((response) => {
+            // Cache new responses
+            if (response && response.status === 200) {
+              const responseClone = response.clone();
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+                  cache.put(event.request, responseClone);
+                });
             }
-            
-            // Clone the response as it can only be consumed once
-            const responseToCache = response.clone();
-            
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-              
             return response;
           });
       })
