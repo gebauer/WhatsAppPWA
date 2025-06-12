@@ -380,31 +380,38 @@
     }
 
     function selectContact() {
-      // Create a temporary input element
-      const input = document.createElement('input');
-      input.type = 'tel';
-      input.setAttribute('autocomplete', 'tel');
-      input.setAttribute('autocorrect', 'off');
-      input.setAttribute('autocapitalize', 'off');
-      input.setAttribute('spellcheck', 'false');
-      
-      // Add it to the document
-      document.body.appendChild(input);
-      
-      // Focus it to trigger the contact picker
-      input.focus();
-      
-      // Add event listener for when a contact is selected
-      input.addEventListener('change', function() {
-        if (this.value) {
-          document.getElementById('phoneNumber').value = this.value;
+        if ('contacts' in navigator && 'ContactsManager' in window) {
+            // Use the Contacts API if available
+            navigator.contacts.select(['tel'], { multiple: false })
+                .then(contacts => {
+                    if (contacts && contacts.length > 0) {
+                        const phoneNumber = contacts[0].tel[0];
+                        document.getElementById('phoneNumber').value = phoneNumber;
+                    }
+                })
+                .catch(err => {
+                    console.error('Error selecting contact:', err);
+                    // Fallback to basic input if Contacts API fails
+                    const input = document.createElement('input');
+                    input.type = 'tel';
+                    input.setAttribute('autocomplete', 'tel');
+                    document.body.appendChild(input);
+                    input.focus();
+                    setTimeout(() => {
+                        document.body.removeChild(input);
+                    }, 100);
+                });
+        } else {
+            // Fallback for browsers that don't support Contacts API
+            const input = document.createElement('input');
+            input.type = 'tel';
+            input.setAttribute('autocomplete', 'tel');
+            document.body.appendChild(input);
+            input.focus();
+            setTimeout(() => {
+                document.body.removeChild(input);
+            }, 100);
         }
-      });
-      
-      // Remove it after a short delay
-      setTimeout(() => {
-        document.body.removeChild(input);
-      }, 100);
     }
   </script>
 </body>
