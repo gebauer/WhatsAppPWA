@@ -283,10 +283,6 @@
       <div id="phoneError" class="error"></div>
     </div>
 
-    <div class="input-group">
-      <textarea id="message" placeholder="Optional message" rows="3"></textarea>
-    </div>
-
     <div class="button-group">
       <button id="generateButton" class="primary-button" onclick="openWhatsApp()">
         <span data-i18n="generateButton">Open in WhatsApp</span>
@@ -366,7 +362,6 @@
 
     function openWhatsApp() {
       const phoneNumber = document.getElementById('phoneNumber').value.trim();
-      const message = document.getElementById('message').value.trim();
       const countryCode = document.getElementById('countryCode').value;
       
       if (!phoneNumber) {
@@ -378,10 +373,7 @@
       const cleanNumber = phoneNumber.replace(/\D/g, '');
       
       // Construct the WhatsApp URL
-      let whatsappUrl = `https://wa.me/${countryCode}${cleanNumber}`;
-      if (message) {
-        whatsappUrl += `?text=${encodeURIComponent(message)}`;
-      }
+      const whatsappUrl = `https://wa.me/${countryCode}${cleanNumber}`;
       
       // Open WhatsApp directly
       window.open(whatsappUrl, '_blank');
