@@ -70,33 +70,21 @@ export class Settings {
     const language = locale.split('-')[0];
     const region = locale.split('-')[1];
 
-    console.log('Browser Language Settings:');
-    console.log('navigator.language:', navigator.language);
-    console.log('navigator.userLanguage:', navigator.userLanguage);
-    console.log('navigator.languages:', navigator.languages);
-    console.log('Detected locale:', locale);
-    console.log('Detected language:', language);
-    console.log('Detected region:', region);
-
     // Try exact match first (e.g., 'de-DE')
     if (countryCodeMap[locale]) {
-      console.log('Found exact match for locale:', locale);
       return countryCodeMap[locale];
     }
     
     // Try language-region match (e.g., 'de-AT')
     if (region && countryCodeMap[`${language}-${region}`]) {
-      console.log('Found language-region match:', `${language}-${region}`);
       return countryCodeMap[`${language}-${region}`];
     }
     
     // Try language only (e.g., 'de')
     if (countryCodeMap[language]) {
-      console.log('Found language match:', language);
       return countryCodeMap[language];
     }
 
-    console.log('No match found, defaulting to Germany');
     // Default to Germany if no match found
     return '49';
   }
@@ -104,12 +92,10 @@ export class Settings {
   loadSettings() {
     const savedCountryCode = localStorage.getItem('countryCode');
     if (savedCountryCode) {
-      console.log('Using saved country code:', savedCountryCode);
       this.countryCodeSelect.value = savedCountryCode;
     } else {
       // First time setup - detect country code
       const defaultCountryCode = this.getDefaultCountryCode();
-      console.log('Using detected country code:', defaultCountryCode);
       this.countryCodeSelect.value = defaultCountryCode;
       this.saveSettings();
     }
