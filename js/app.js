@@ -9,7 +9,6 @@ export class App {
     this.pwa = new PWA();
     
     this.phoneInput = document.getElementById('phone');
-    this.messageInput = document.getElementById('message');
     this.generateButton = document.getElementById('generateButton');
     this.copyButton = document.getElementById('copyButton');
     this.status = document.getElementById('status');
@@ -28,7 +27,6 @@ export class App {
 
   generateLink() {
     const phone = this.phoneInput.value.replace(/\D/g, '');
-    const message = encodeURIComponent(this.messageInput.value);
     const countryCode = this.settings.getCountryCode();
     
     if (!phone) {
@@ -36,7 +34,7 @@ export class App {
       return;
     }
 
-    const link = `https://wa.me/${countryCode}${phone}${message ? `?text=${message}` : ''}`;
+    const link = `https://wa.me/${countryCode}${phone}`;
     this.copyButton.dataset.link = link;
     this.showStatus('Link generated! Click "Copy Link" to copy it.', 'success');
   }

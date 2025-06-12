@@ -126,6 +126,9 @@ button:active {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
 }
 
 #settingsButton:hover {
@@ -199,6 +202,7 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.3s ease;
 }
 
 .close-button:hover {

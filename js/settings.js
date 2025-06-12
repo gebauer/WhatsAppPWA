@@ -15,20 +15,38 @@ export class Settings {
   }
 
   attachEventListeners() {
-    this.settingsButton.addEventListener('click', () => this.openSettings());
-    this.settingsOverlay.addEventListener('click', () => this.closeSettings());
-    this.closeButton.addEventListener('click', () => this.closeSettings());
-    this.countryCodeSelect.addEventListener('change', () => this.saveSettings());
+    this.settingsButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.openSettings();
+    });
+
+    this.settingsOverlay.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.closeSettings();
+    });
+
+    this.closeButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.closeSettings();
+    });
+
+    this.countryCodeSelect.addEventListener('change', () => {
+      this.saveSettings();
+    });
   }
 
   openSettings() {
-    this.settingsPanel.style.display = 'block';
-    this.settingsOverlay.style.display = 'block';
+    if (this.settingsPanel && this.settingsOverlay) {
+      this.settingsPanel.style.display = 'block';
+      this.settingsOverlay.style.display = 'block';
+    }
   }
 
   closeSettings() {
-    this.settingsPanel.style.display = 'none';
-    this.settingsOverlay.style.display = 'none';
+    if (this.settingsPanel && this.settingsOverlay) {
+      this.settingsPanel.style.display = 'none';
+      this.settingsOverlay.style.display = 'none';
+    }
   }
 
   loadSettings() {
