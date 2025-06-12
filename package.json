@@ -1,0 +1,14 @@
+{
+  "name": "whatsapp-link-generator",
+  "version": "1.0.0",
+  "description": "A PWA for generating WhatsApp chat links",
+  "private": true,
+  "scripts": {
+    "start": "serve .",
+    "deploy": "gh-pages -d ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.1",
+    "gh-pages": "^6.1.0"
+  }
+} 
