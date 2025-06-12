@@ -155,7 +155,9 @@
         settings: "Settings",
         defaultCountryCode: "Default Country Code:",
         saveSettings: "Save Settings",
-        settingsSaved: "Settings saved successfully!"
+        settingsSaved: "Settings saved successfully!",
+        update: "Update Now",
+        updateAvailable: "A new version is available!"
       },
       de: {
         title: "WhatsApp Link Generator",
@@ -172,7 +174,9 @@
         settings: "Einstellungen",
         defaultCountryCode: "Standardvorwahl:",
         saveSettings: "Einstellungen speichern",
-        settingsSaved: "Einstellungen erfolgreich gespeichert!"
+        settingsSaved: "Einstellungen erfolgreich gespeichert!",
+        update: "Jetzt aktualisieren",
+        updateAvailable: "Eine neue Version ist verfügbar!"
       }
     };
 
@@ -336,14 +340,71 @@
       navigator.serviceWorker.register('sw.js')
         .then(registration => {
           console.log('ServiceWorker registration successful');
+          
+          // Check for updates every hour
+          setInterval(() => {
+            registration.update();
+          }, 60 * 60 * 1000);
+
+          // Handle updates
           registration.addEventListener('updatefound', () => {
             const newWorker = registration.installing;
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                 const lang = document.documentElement.lang;
-                if (confirm(translations[lang].updateAvailable)) {
+                const updateMessage = document.createElement('div');
+                updateMessage.style.cssText = `
+                  position: fixed;
+                  bottom: 1em;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  background: #25D366;
+                  color: white;
+                  padding: 1em;
+                  border-radius: 0.5em;
+                  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                  z-index: 1000;
+                  display: flex;
+                  align-items: center;
+                  gap: 1em;
+                `;
+                
+                const message = document.createElement('span');
+                message.textContent = translations[lang].updateAvailable;
+                
+                const updateButton = document.createElement('button');
+                updateButton.textContent = translations[lang].update;
+                updateButton.style.cssText = `
+                  background: white;
+                  color: #25D366;
+                  border: none;
+                  padding: 0.5em 1em;
+                  border-radius: 0.3em;
+                  cursor: pointer;
+                  font-weight: bold;
+                `;
+                updateButton.onclick = () => {
                   window.location.reload();
-                }
+                };
+                
+                const closeButton = document.createElement('button');
+                closeButton.textContent = '×';
+                closeButton.style.cssText = `
+                  background: none;
+                  border: none;
+                  color: white;
+                  font-size: 1.5em;
+                  cursor: pointer;
+                  padding: 0 0.5em;
+                `;
+                closeButton.onclick = () => {
+                  document.body.removeChild(updateMessage);
+                };
+                
+                updateMessage.appendChild(message);
+                updateMessage.appendChild(updateButton);
+                updateMessage.appendChild(closeButton);
+                document.body.appendChild(updateMessage);
               }
             });
           });
