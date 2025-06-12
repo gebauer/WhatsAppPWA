@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,7 +20,7 @@
       text-align: center;
       margin-top: 5em;
     }
-    input, button {
+    input, button, select {
       font-size: 1.2em;
       padding: 0.5em;
       margin: 0.5em;
@@ -43,41 +43,277 @@
       border-radius: 0.5em;
       cursor: pointer;
     }
+    #languageSelector {
+      position: fixed;
+      top: 1em;
+      right: 1em;
+      padding: 0.5em;
+    }
+    #settingsButton {
+      position: fixed;
+      top: 1em;
+      left: 1em;
+      padding: 0.5em;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.5em;
+    }
+    #settingsPanel {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 2em;
+      border-radius: 1em;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+    #settingsOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .settings-row {
+      margin: 1em 0;
+      text-align: left;
+    }
+    .settings-row label {
+      display: block;
+      margin-bottom: 0.5em;
+    }
+    .close-button {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>WhatsApp Link Generator</h1>
-  <div id="installPrompt">Als App installieren</div>
-  <input id="phone" type="tel" placeholder="z. B. 01711234567" />
+  <button id="settingsButton" title="Settings">⚙️</button>
+  <select id="languageSelector" onchange="changeLanguage(this.value)">
+    <option value="en">English</option>
+    <option value="de">Deutsch</option>
+  </select>
+
+  <div id="settingsOverlay"></div>
+  <div id="settingsPanel">
+    <button class="close-button" onclick="closeSettings()">×</button>
+    <h2 data-i18n="settings">Settings</h2>
+    <div class="settings-row">
+      <label for="countryCode" data-i18n="defaultCountryCode">Default Country Code:</label>
+      <select id="countryCode">
+        <option value="49">Germany (+49)</option>
+        <option value="44">United Kingdom (+44)</option>
+        <option value="1">United States (+1)</option>
+        <option value="33">France (+33)</option>
+        <option value="39">Italy (+39)</option>
+        <option value="34">Spain (+34)</option>
+        <option value="31">Netherlands (+31)</option>
+        <option value="32">Belgium (+32)</option>
+        <option value="41">Switzerland (+41)</option>
+        <option value="43">Austria (+43)</option>
+      </select>
+    </div>
+    <button onclick="saveSettings()" data-i18n="saveSettings">Save Settings</button>
+  </div>
+
+  <h1 data-i18n="title">WhatsApp Link Generator</h1>
+  <div id="installPrompt" data-i18n="install">Install as App</div>
+  <input id="phone" type="tel" data-i18n-placeholder="phonePlaceholder" placeholder="e.g. 01711234567" />
   <br />
-  <button onclick="openWhatsApp()">In WhatsApp öffnen</button>
-  <button onclick="pickContact()">Kontakt auswählen</button>
+  <button onclick="openWhatsApp()" data-i18n="openWhatsApp">Open in WhatsApp</button>
+  <button onclick="pickContact()" data-i18n="pickContact">Select Contact</button>
   <div id="status"></div>
 
   <script>
+    // Translations
+    const translations = {
+      en: {
+        title: "WhatsApp Link Generator",
+        install: "Install as App",
+        phonePlaceholder: "e.g. 01711234567",
+        openWhatsApp: "Open in WhatsApp",
+        pickContact: "Select Contact",
+        online: "Online",
+        offline: "Offline - App running from cache",
+        updateAvailable: "A new version is available. Update now?",
+        contactPickerNotSupported: "Your browser doesn't support the Contact Picker API.",
+        noValidContact: "No valid contact selected.",
+        contactAccessDenied: "Contact access denied or cancelled.",
+        settings: "Settings",
+        defaultCountryCode: "Default Country Code:",
+        saveSettings: "Save Settings",
+        settingsSaved: "Settings saved successfully!"
+      },
+      de: {
+        title: "WhatsApp Link Generator",
+        install: "Als App installieren",
+        phonePlaceholder: "z. B. 01711234567",
+        openWhatsApp: "In WhatsApp öffnen",
+        pickContact: "Kontakt auswählen",
+        online: "Online",
+        offline: "Offline - App läuft im Cache",
+        updateAvailable: "Eine neue Version ist verfügbar. Jetzt aktualisieren?",
+        contactPickerNotSupported: "Dein Browser unterstützt das Contact Picker API leider nicht.",
+        noValidContact: "Kein gültiger Kontakt ausgewählt.",
+        contactAccessDenied: "Zugriff auf Kontakte verweigert oder abgebrochen.",
+        settings: "Einstellungen",
+        defaultCountryCode: "Standardvorwahl:",
+        saveSettings: "Einstellungen speichern",
+        settingsSaved: "Einstellungen erfolgreich gespeichert!"
+      }
+    };
+
+    // Settings management
+    function getDefaultCountryCode() {
+      // Map of language codes to country codes
+      const countryCodeMap = {
+        'de': '49',    // Germany
+        'en-GB': '44', // United Kingdom
+        'en-US': '1',  // United States
+        'fr': '33',    // France
+        'it': '39',    // Italy
+        'es': '34',    // Spain
+        'nl': '31',    // Netherlands
+        'be': '32',    // Belgium
+        'de-CH': '41', // Switzerland
+        'de-AT': '43', // Austria
+        'en': '44',    // Default to UK for generic English
+      };
+
+      // Try to get the most specific locale first
+      const locale = navigator.language || navigator.userLanguage;
+      const language = locale.split('-')[0];
+      const region = locale.split('-')[1];
+
+      // Try exact match first (e.g., 'de-DE')
+      if (countryCodeMap[locale]) {
+        return countryCodeMap[locale];
+      }
+      
+      // Try language-region match (e.g., 'de-AT')
+      if (region && countryCodeMap[`${language}-${region}`]) {
+        return countryCodeMap[`${language}-${region}`];
+      }
+      
+      // Try language only (e.g., 'de')
+      if (countryCodeMap[language]) {
+        return countryCodeMap[language];
+      }
+
+      // Default to Germany if no match found
+      return '49';
+    }
+
+    function loadSettings() {
+      const savedSettings = localStorage.getItem('settings');
+      if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        document.getElementById('countryCode').value = settings.countryCode;
+        return settings;
+      } else {
+        // First time setup - detect country code
+        const defaultCountryCode = getDefaultCountryCode();
+        const settings = { countryCode: defaultCountryCode };
+        localStorage.setItem('settings', JSON.stringify(settings));
+        document.getElementById('countryCode').value = defaultCountryCode;
+        return settings;
+      }
+    }
+
+    function saveSettings() {
+      const settings = {
+        countryCode: document.getElementById('countryCode').value
+      };
+      localStorage.setItem('settings', JSON.stringify(settings));
+      closeSettings();
+      const lang = document.documentElement.lang;
+      alert(translations[lang].settingsSaved);
+    }
+
+    function openSettings() {
+      document.getElementById('settingsOverlay').style.display = 'block';
+      document.getElementById('settingsPanel').style.display = 'block';
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsOverlay').style.display = 'none';
+      document.getElementById('settingsPanel').style.display = 'none';
+    }
+
+    // Language detection and initialization
+    function getBrowserLanguage() {
+      const lang = navigator.language || navigator.userLanguage;
+      return lang.startsWith('de') ? 'de' : 'en';
+    }
+
+    function setLanguage(lang) {
+      document.documentElement.lang = lang;
+      document.querySelector('#languageSelector').value = lang;
+      
+      // Update all elements with data-i18n attribute
+      document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (translations[lang][key]) {
+          element.textContent = translations[lang][key];
+        }
+      });
+
+      // Update all elements with data-i18n-placeholder attribute
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        if (translations[lang][key]) {
+          element.placeholder = translations[lang][key];
+        }
+      });
+
+      // Update status text
+      updateOnlineStatus();
+    }
+
+    function changeLanguage(lang) {
+      setLanguage(lang);
+      localStorage.setItem('preferredLanguage', lang);
+    }
+
+    // Initialize language and settings
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    setLanguage(savedLanguage || getBrowserLanguage());
+    const settings = loadSettings();
+
+    // Event Listeners
+    document.getElementById('settingsButton').addEventListener('click', openSettings);
+    document.getElementById('settingsOverlay').addEventListener('click', closeSettings);
+
     // PWA installation handling
     let deferredPrompt;
     const installPrompt = document.getElementById('installPrompt');
     
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
-      // Stash the event so it can be triggered later
       deferredPrompt = e;
-      // Show the install button
       installPrompt.style.display = 'block';
     });
     
     installPrompt.addEventListener('click', async () => {
       if (deferredPrompt) {
-        // Show the install prompt
         deferredPrompt.prompt();
-        // Wait for the user to respond to the prompt
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
           installPrompt.style.display = 'none';
         }
-        // Clear the deferredPrompt so it can be garbage collected
         deferredPrompt = null;
       }
     });
@@ -85,7 +321,8 @@
     // Offline status detection
     const status = document.getElementById('status');
     function updateOnlineStatus() {
-      status.textContent = navigator.onLine ? 'Online' : 'Offline - App läuft im Cache';
+      const lang = document.documentElement.lang;
+      status.textContent = navigator.onLine ? translations[lang].online : translations[lang].offline;
       status.style.background = navigator.onLine ? '#25D366' : '#ff9800';
       status.style.color = 'white';
     }
@@ -103,8 +340,8 @@
             const newWorker = registration.installing;
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // New version available
-                if (confirm('Eine neue Version ist verfügbar. Jetzt aktualisieren?')) {
+                const lang = document.documentElement.lang;
+                if (confirm(translations[lang].updateAvailable)) {
                   window.location.reload();
                 }
               }
@@ -120,11 +357,12 @@
       let phone = document.getElementById('phone').value.trim();
       phone = phone.replace(/^\+|^00/, '');
 
-      if (!phone.startsWith('49')) {
+      const settings = loadSettings();
+      if (!phone.startsWith(settings.countryCode)) {
         if (phone.startsWith('0')) {
           phone = phone.substring(1);
         }
-        phone = '49' + phone;
+        phone = settings.countryCode + phone;
       }
 
       const url = "https://wa.me/" + encodeURIComponent(phone);
@@ -132,8 +370,10 @@
     }
 
     async function pickContact() {
+      const lang = document.documentElement.lang;
+      
       if (!('contacts' in navigator && 'ContactsManager' in window)) {
-        alert("Dein Browser unterstützt das Contact Picker API leider nicht.");
+        alert(translations[lang].contactPickerNotSupported);
         return;
       }
 
@@ -144,10 +384,10 @@
         if (contacts.length > 0 && contacts[0].tel.length > 0) {
           document.getElementById('phone').value = contacts[0].tel[0];
         } else {
-          alert("Kein gültiger Kontakt ausgewählt.");
+          alert(translations[lang].noValidContact);
         }
       } catch (err) {
-        alert("Zugriff auf Kontakte verweigert oder abgebrochen.");
+        alert(translations[lang].contactAccessDenied);
       }
     }
   </script>
