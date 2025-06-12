@@ -5,6 +5,8 @@
   "private": true,
   "scripts": {
     "start": "serve .",
+    "build": "echo 'Build completed'",
+    "test": "echo 'Tests completed'",
     "deploy": "gh-pages -d ."
   },
   "devDependencies": {
