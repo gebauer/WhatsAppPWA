@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Link Generator</title>
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 5em;
+    }
+    input, button {
+      font-size: 1.2em;
+      padding: 0.5em;
+      margin: 0.5em;
+    }
+  </style>
+</head>
+<body>
+  <h1>WhatsApp Link Generator</h1>
+  <input id="phone" type="tel" placeholder="z. B. 01711234567" />
+  <br />
+  <button onclick="openWhatsApp()">In WhatsApp öffnen</button>
+  <button onclick="pickContact()">Kontakt auswählen</button>
+
+  <script>
+    function openWhatsApp() {
+      let phone = document.getElementById('phone').value.trim();
+      phone = phone.replace(/^\+|^00/, '');
+
+      if (!phone.startsWith('49')) {
+        if (phone.startsWith('0')) {
+          phone = phone.substring(1);
+        }
+        phone = '49' + phone;
+      }
+
+      const url = "https://wa.me/" + encodeURIComponent(phone);
+      window.location.href = url;
+    }
+
+    async function pickContact() {
+      if (!('contacts' in navigator && 'ContactsManager' in window)) {
+        alert("Dein Browser unterstützt das Contact Picker API leider nicht.");
+        return;
+      }
+
+      try {
+        const props = ['name', 'tel'];
+        const opts = { multiple: false };
+        const contacts = await navigator.contacts.select(props, opts);
+        if (contacts.length > 0 && contacts[0].tel.length > 0) {
+          document.getElementById('phone').value = contacts[0].tel[0];
+        } else {
+          alert("Kein gültiger Kontakt ausgewählt.");
+        }
+      } catch (err) {
+        alert("Zugriff auf Kontakte verweigert oder abgebrochen.");
+      }
+    }
+  </script>
+</body>
+</html>
