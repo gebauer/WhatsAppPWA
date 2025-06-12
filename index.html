@@ -102,7 +102,7 @@
   </style>
 </head>
 <body>
-  <button id="settingsButton" title="Settings">⚙️</button>
+  <button id="settingsButton" title="Settings" onclick="openSettings()">⚙️</button>
   <select id="languageSelector" onchange="changeLanguage(this.value)">
     <option value="en">English</option>
     <option value="de">Deutsch</option>
@@ -249,13 +249,29 @@
     }
 
     function openSettings() {
-      document.getElementById('settingsOverlay').style.display = 'block';
-      document.getElementById('settingsPanel').style.display = 'block';
+      console.log('Opening settings...');
+      const overlay = document.getElementById('settingsOverlay');
+      const panel = document.getElementById('settingsPanel');
+      
+      if (overlay && panel) {
+        overlay.style.display = 'block';
+        panel.style.display = 'block';
+        console.log('Settings panel opened');
+      } else {
+        console.error('Settings elements not found:', { overlay, panel });
+      }
     }
 
     function closeSettings() {
-      document.getElementById('settingsOverlay').style.display = 'none';
-      document.getElementById('settingsPanel').style.display = 'none';
+      console.log('Closing settings...');
+      const overlay = document.getElementById('settingsOverlay');
+      const panel = document.getElementById('settingsPanel');
+      
+      if (overlay && panel) {
+        overlay.style.display = 'none';
+        panel.style.display = 'none';
+        console.log('Settings panel closed');
+      }
     }
 
     // Language detection and initialization
@@ -300,14 +316,13 @@
 
     // Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
-      const settingsButton = document.getElementById('settingsButton');
-      if (settingsButton) {
-        settingsButton.addEventListener('click', openSettings);
-      }
-      
+      console.log('DOM Content Loaded');
       const settingsOverlay = document.getElementById('settingsOverlay');
       if (settingsOverlay) {
+        console.log('Settings overlay found, adding click listener');
         settingsOverlay.addEventListener('click', closeSettings);
+      } else {
+        console.error('Settings overlay not found');
       }
     });
 
