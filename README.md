@@ -19,7 +19,10 @@ WhatsApp requires access to your contacts to function on smartphones, which rais
 - 💾 Works offline
 - 📲 Can be installed as a standalone app
 - 🌐 Progressive Web App (PWA) support
-- 🔄 Automatic phone number formatting for German numbers
+- 🔄 Automatic phone number formatting
+- 🌙 Dark mode support
+- 🌍 Multi-language support (English and German)
+- 📱 Responsive design for all devices
 
 ## How to Use
 
@@ -63,4 +66,4 @@ This project is open source and available under the MIT License.
 
 ## Deployment
 
-This project is deployed on GitHub Pages. You can access it at: [Your GitHub Pages URL] 
+This project is deployed on GitHub Pages. You can access it at: [https://gebauer.github.io/WhatsAppPWA/](https://gebauer.github.io/WhatsAppPWA/) 

@@ -8,7 +8,7 @@ export class App {
     this.i18n = new I18n();
     this.pwa = new PWA();
     
-    this.phoneInput = document.getElementById('phone');
+    this.phoneInput = document.getElementById('phoneNumber');
     this.generateButton = document.getElementById('generateButton');
     this.copyButton = document.getElementById('copyButton');
     this.status = document.getElementById('status');
@@ -21,34 +21,59 @@ export class App {
   }
 
   attachEventListeners() {
-    this.generateButton.addEventListener('click', () => this.generateLink());
-    this.copyButton.addEventListener('click', () => this.copyLink());
+    this.generateButton.addEventListener('click', () => this.openWhatsApp());
+    this.copyButton.addEventListener('click', () => this.selectContact());
   }
 
-  generateLink() {
-    const phone = this.phoneInput.value.replace(/\D/g, '');
+  openWhatsApp() {
+    const phoneNumber = this.phoneInput.value.trim();
     const countryCode = this.settings.getCountryCode();
     
-    if (!phone) {
-      this.showStatus('Please enter a phone number', 'error');
+    if (!phoneNumber) {
+      this.showStatus(this.i18n.getTranslation('phoneError'), 'error');
       return;
     }
-
-    const link = `https://wa.me/${countryCode}${phone}`;
-    this.copyButton.dataset.link = link;
-    this.showStatus('Link generated! Click "Copy Link" to copy it.', 'success');
+    
+    // Remove any non-digit characters from the phone number
+    const cleanNumber = phoneNumber.replace(/\D/g, '');
+    
+    // Construct the WhatsApp URL
+    const whatsappUrl = `https://wa.me/${countryCode}${cleanNumber}`;
+    
+    // Open WhatsApp directly
+    window.open(whatsappUrl, '_blank');
   }
 
-  copyLink() {
-    const link = this.copyButton.dataset.link;
-    if (!link) {
-      this.showStatus('Please generate a link first', 'error');
-      return;
+  selectContact() {
+    if ('contacts' in navigator && 'ContactsManager' in window) {
+      // Use the Contacts API if available
+      navigator.contacts.select(['tel'], { multiple: false })
+        .then(contacts => {
+          if (contacts && contacts.length > 0) {
+            const phoneNumber = contacts[0].tel[0];
+            this.phoneInput.value = phoneNumber;
+          }
+        })
+        .catch(err => {
+          console.error('Error selecting contact:', err);
+          // Fallback to basic input if Contacts API fails
+          this.fallbackContactSelection();
+        });
+    } else {
+      // Fallback for browsers that don't support Contacts API
+      this.fallbackContactSelection();
     }
+  }
 
-    navigator.clipboard.writeText(link)
-      .then(() => this.showStatus('Link copied to clipboard!', 'success'))
-      .catch(() => this.showStatus('Failed to copy link', 'error'));
+  fallbackContactSelection() {
+    const input = document.createElement('input');
+    input.type = 'tel';
+    input.setAttribute('autocomplete', 'tel');
+    document.body.appendChild(input);
+    input.focus();
+    setTimeout(() => {
+      document.body.removeChild(input);
+    }, 100);
   }
 
   showStatus(message, type = 'info') {
