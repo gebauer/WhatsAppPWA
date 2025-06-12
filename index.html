@@ -283,10 +283,10 @@
     </div>
 
     <div class="button-group">
-      <button id="generateButton" class="primary-button" onclick="generateLink()">
+      <button id="generateButton" class="primary-button" onclick="openWhatsApp()">
         <span data-i18n="generateButton">In WhatsApp öffnen</span>
       </button>
-      <button id="copyButton" class="secondary-button" onclick="copyLink()">
+      <button id="copyButton" class="secondary-button" onclick="selectContact()">
         <span data-i18n="copyButton">Kontakt auswählen</span>
       </button>
     </div>
@@ -359,7 +359,7 @@
       }
     }
 
-    function generateLink() {
+    function openWhatsApp() {
       const phoneNumber = document.getElementById('phone').value.trim();
       const message = document.getElementById('message').value.trim();
       const countryCode = document.getElementById('countryCode').value;
@@ -382,36 +382,32 @@
       window.open(whatsappUrl, '_blank');
     }
 
-    function copyLink() {
-      const phoneNumber = document.getElementById('phone').value.trim();
-      const message = document.getElementById('message').value.trim();
-      const countryCode = document.getElementById('countryCode').value;
+    function selectContact() {
+      // Create a temporary input element
+      const input = document.createElement('input');
+      input.type = 'tel';
+      input.setAttribute('autocomplete', 'tel');
+      input.setAttribute('autocorrect', 'off');
+      input.setAttribute('autocapitalize', 'off');
+      input.setAttribute('spellcheck', 'false');
       
-      if (!phoneNumber) {
-        showError('phoneError', 'Bitte geben Sie eine Telefonnummer ein');
-        return;
-      }
+      // Add it to the document
+      document.body.appendChild(input);
       
-      // Remove any non-digit characters from the phone number
-      const cleanNumber = phoneNumber.replace(/\D/g, '');
+      // Focus it to trigger the contact picker
+      input.focus();
       
-      // Construct the WhatsApp URL
-      let whatsappUrl = `https://wa.me/${countryCode}${cleanNumber}`;
-      if (message) {
-        whatsappUrl += `?text=${encodeURIComponent(message)}`;
-      }
-      
-      // Copy to clipboard
-      navigator.clipboard.writeText(whatsappUrl).then(() => {
-        const copyButton = document.getElementById('copyButton');
-        const originalText = copyButton.querySelector('[data-i18n="copyButton"]').textContent;
-        copyButton.querySelector('[data-i18n="copyButton"]').textContent = 'Link kopiert!';
-        setTimeout(() => {
-          copyButton.querySelector('[data-i18n="copyButton"]').textContent = originalText;
-        }, 2000);
-      }).catch(err => {
-        console.error('Failed to copy: ', err);
+      // Add event listener for when a contact is selected
+      input.addEventListener('change', function() {
+        if (this.value) {
+          document.getElementById('phone').value = this.value;
+        }
       });
+      
+      // Remove it after a short delay
+      setTimeout(() => {
+        document.body.removeChild(input);
+      }, 100);
     }
   </script>
 </body>
