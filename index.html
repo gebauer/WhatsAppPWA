@@ -282,8 +282,14 @@
       <input type="tel" id="phone" placeholder="e.g. 01711234567">
     </div>
 
-    <button id="generateButton" data-i18n="generateButton">Generate Link</button>
-    <button id="copyButton" data-i18n="copyButton">Copy Link</button>
+    <div class="button-group">
+      <button id="generateButton" class="primary-button" onclick="generateLink()">
+        <span data-i18n="generateButton">In WhatsApp öffnen</span>
+      </button>
+      <button id="copyButton" class="secondary-button" onclick="copyLink()">
+        <span data-i18n="copyButton">Kontakt auswählen</span>
+      </button>
+    </div>
   </div>
 
   <div id="settingsPanel">
@@ -334,5 +340,75 @@
   <div id="installPrompt" data-i18n="installPrompt">Install App</div>
 
   <script type="module" src="js/app.js"></script>
+  <script>
+    // Update button text based on language
+    function updateButtonText() {
+      const generateButton = document.getElementById('generateButton');
+      const copyButton = document.getElementById('copyButton');
+      
+      if (currentLang === 'de') {
+        generateButton.textContent = 'In WhatsApp öffnen';
+        copyButton.textContent = 'Kontakt auswählen';
+      } else {
+        generateButton.textContent = 'Open in WhatsApp';
+        copyButton.textContent = 'Select Contact';
+      }
+    }
+
+    function generateLink() {
+      const phoneNumber = document.getElementById('phone').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const countryCode = document.getElementById('countryCode').value;
+      
+      if (!phoneNumber) {
+        showError('phoneError', 'Bitte geben Sie eine Telefonnummer ein');
+        return;
+      }
+      
+      // Remove any non-digit characters from the phone number
+      const cleanNumber = phoneNumber.replace(/\D/g, '');
+      
+      // Construct the WhatsApp URL
+      let whatsappUrl = `https://wa.me/${countryCode}${cleanNumber}`;
+      if (message) {
+        whatsappUrl += `?text=${encodeURIComponent(message)}`;
+      }
+      
+      // Open WhatsApp directly
+      window.open(whatsappUrl, '_blank');
+    }
+
+    function copyLink() {
+      const phoneNumber = document.getElementById('phone').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const countryCode = document.getElementById('countryCode').value;
+      
+      if (!phoneNumber) {
+        showError('phoneError', 'Bitte geben Sie eine Telefonnummer ein');
+        return;
+      }
+      
+      // Remove any non-digit characters from the phone number
+      const cleanNumber = phoneNumber.replace(/\D/g, '');
+      
+      // Construct the WhatsApp URL
+      let whatsappUrl = `https://wa.me/${countryCode}${cleanNumber}`;
+      if (message) {
+        whatsappUrl += `?text=${encodeURIComponent(message)}`;
+      }
+      
+      // Copy to clipboard
+      navigator.clipboard.writeText(whatsappUrl).then(() => {
+        const copyButton = document.getElementById('copyButton');
+        const originalText = copyButton.querySelector('[data-i18n="copyButton"]').textContent;
+        copyButton.querySelector('[data-i18n="copyButton"]').textContent = 'Link kopiert!';
+        setTimeout(() => {
+          copyButton.querySelector('[data-i18n="copyButton"]').textContent = originalText;
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+      });
+    }
+  </script>
 </body>
 </html>
