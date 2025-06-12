@@ -58,6 +58,7 @@
       border: none;
       cursor: pointer;
       font-size: 1.5em;
+      z-index: 1000;
     }
     #settingsPanel {
       display: none;
@@ -298,8 +299,17 @@
     const settings = loadSettings();
 
     // Event Listeners
-    document.getElementById('settingsButton').addEventListener('click', openSettings);
-    document.getElementById('settingsOverlay').addEventListener('click', closeSettings);
+    document.addEventListener('DOMContentLoaded', () => {
+      const settingsButton = document.getElementById('settingsButton');
+      if (settingsButton) {
+        settingsButton.addEventListener('click', openSettings);
+      }
+      
+      const settingsOverlay = document.getElementById('settingsOverlay');
+      if (settingsOverlay) {
+        settingsOverlay.addEventListener('click', closeSettings);
+      }
+    });
 
     // PWA installation handling
     let deferredPrompt;
