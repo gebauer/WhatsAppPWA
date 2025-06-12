@@ -8,70 +8,176 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="apple-mobile-web-app-title" content="WA Generator" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
-  <title>WhatsApp Link Generator</title>
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+  <title data-i18n="title">WhatsApp Link Generator</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png" />
+  <link rel="stylesheet" href="styles.css">
   <style>
+    :root {
+      /* Light theme (default) */
+      --primary-color: #25D366;
+      --primary-dark: #128C7E;
+      --primary-light: #DCF8C6;
+      --text-on-primary: white;
+      --surface-color: white;
+      --background-color: #f5f5f5;
+      --text-color: #333;
+      --text-secondary: #666;
+      --border-color: #ddd;
+      --error-color: #B00020;
+      --success-color: #4CAF50;
+      --elevation-1: 0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.14), 0 1px 3px 0 rgba(0,0,0,0.12);
+      --elevation-2: 0 3px 3px -2px rgba(0,0,0,0.2), 0 3px 4px 0 rgba(0,0,0,0.14), 0 1px 8px 0 rgba(0,0,0,0.12);
+      --elevation-3: 0 3px 5px -1px rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12);
+      --overlay-color: rgba(0, 0, 0, 0.5);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary-color: #25D366;
+        --primary-dark: #128C7E;
+        --primary-light: #1a3a2e;
+        --text-on-primary: white;
+        --surface-color: #1e1e1e;
+        --background-color: #121212;
+        --text-color: #e0e0e0;
+        --text-secondary: #a0a0a0;
+        --border-color: #333;
+        --error-color: #CF6679;
+        --success-color: #81C784;
+        --elevation-1: 0 2px 1px -1px rgba(0,0,0,0.4), 0 1px 1px 0 rgba(0,0,0,0.28), 0 1px 3px 0 rgba(0,0,0,0.24);
+        --elevation-2: 0 3px 3px -2px rgba(0,0,0,0.4), 0 3px 4px 0 rgba(0,0,0,0.28), 0 1px 8px 0 rgba(0,0,0,0.24);
+        --elevation-3: 0 3px 5px -1px rgba(0,0,0,0.4), 0 6px 10px 0 rgba(0,0,0,0.28), 0 1px 18px 0 rgba(0,0,0,0.24);
+        --overlay-color: rgba(0, 0, 0, 0.7);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 5em;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--background-color);
+      min-height: 100vh;
+      padding: 1rem;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
-    input, button, select {
-      font-size: 1.2em;
-      padding: 0.5em;
-      margin: 0.5em;
+
+    .container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: var(--surface-color);
+      border-radius: 8px;
+      box-shadow: var(--elevation-1);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
-    #status {
-      position: fixed;
-      bottom: 1em;
-      right: 1em;
-      padding: 0.5em;
-      border-radius: 0.5em;
-      background: #eee;
-      font-size: 0.8em;
+
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 2rem;
+      font-size: 2rem;
+      font-weight: 500;
     }
-    #installPrompt {
-      display: none;
-      margin: 1em;
-      padding: 1em;
-      background: #25D366;
-      color: white;
-      border-radius: 0.5em;
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+      background-color: var(--surface-color);
+      color: var(--text-color);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: var(--text-on-primary);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      margin: 0.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
       cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s ease;
+      text-transform: uppercase;
+      font-weight: 500;
+      letter-spacing: 0.5px;
     }
-    #languageSelector {
-      position: fixed;
-      top: 1em;
-      right: 1em;
-      padding: 0.5em;
+
+    button:hover {
+      background-color: var(--primary-dark);
     }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
     #settingsButton {
       position: fixed;
-      top: 1em;
-      left: 1em;
-      padding: 0.5em;
+      top: 1rem;
+      left: 1rem;
       background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1.5em;
+      color: var(--primary-color);
+      font-size: 1.5rem;
+      padding: 0.5rem;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       z-index: 1000;
     }
+
+    #settingsButton:hover {
+      background-color: var(--primary-light);
+    }
+
+    #languageSelector {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: auto;
+      padding: 0.5rem;
+      border-radius: 4px;
+      background-color: var(--surface-color);
+      color: var(--text-color);
+      box-shadow: var(--elevation-1);
+      border: 1px solid var(--border-color);
+    }
+
     #settingsPanel {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: white;
-      padding: 2em;
-      border-radius: 1em;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      background: var(--surface-color);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: var(--elevation-3);
       z-index: 1000;
+      min-width: 300px;
+      transition: background-color 0.3s ease;
     }
+
     #settingsOverlay {
       display: none;
       position: fixed;
@@ -79,45 +185,122 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.5);
+      background: var(--overlay-color);
       z-index: 999;
+      backdrop-filter: blur(2px);
     }
+
     .settings-row {
-      margin: 1em 0;
-      text-align: left;
+      margin: 1.5rem 0;
     }
+
     .settings-row label {
       display: block;
-      margin-bottom: 0.5em;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+      font-weight: 500;
     }
+
     .close-button {
       position: absolute;
-      top: 1em;
-      right: 1em;
+      top: 1rem;
+      right: 1rem;
       background: none;
       border: none;
-      font-size: 1.5em;
+      color: var(--text-color);
+      font-size: 1.5rem;
       cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-button:hover {
+      background-color: var(--primary-light);
+    }
+
+    #status {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      box-shadow: var(--elevation-1);
+      transition: all 0.3s ease;
+      background-color: var(--surface-color);
+      color: var(--text-color);
+    }
+
+    #installPrompt {
+      display: none;
+      margin: 1rem auto;
+      padding: 1rem;
+      background: var(--primary-color);
+      color: var(--text-on-primary);
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: var(--elevation-1);
+      text-align: center;
+      max-width: 300px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 1rem;
+        padding: 1rem;
+      }
+
+      button {
+        width: 100%;
+        margin: 0.5rem 0;
+      }
+
+      #settingsPanel {
+        width: 90%;
+        max-width: none;
+      }
     }
   </style>
 </head>
 <body>
-  <button id="settingsButton" title="Settings" onclick="openSettings()">⚙️</button>
-  <select id="languageSelector" onchange="changeLanguage(this.value)">
+  <button id="settingsButton" title="Settings">⚙️</button>
+  <select id="languageSelector">
     <option value="en">English</option>
     <option value="de">Deutsch</option>
   </select>
 
-  <div id="settingsOverlay"></div>
+  <div class="container">
+    <h1 data-i18n="title">WhatsApp Link Generator</h1>
+    
+    <div class="input-group">
+      <label for="phone" data-i18n="phoneLabel">Phone Number</label>
+      <input type="tel" id="phone" placeholder="1234567890">
+    </div>
+
+    <div class="input-group">
+      <label for="message" data-i18n="messageLabel">Message (optional)</label>
+      <input type="text" id="message" placeholder="Hello!">
+    </div>
+
+    <button id="generateButton" data-i18n="generateButton">Generate Link</button>
+    <button id="copyButton" data-i18n="copyButton">Copy Link</button>
+  </div>
+
   <div id="settingsPanel">
-    <button class="close-button" onclick="closeSettings()">×</button>
-    <h2 data-i18n="settings">Settings</h2>
+    <h2 data-i18n="settingsTitle">Settings</h2>
+    <button class="close-button" data-i18n="closeButton">×</button>
+    
     <div class="settings-row">
-      <label for="countryCode" data-i18n="defaultCountryCode">Default Country Code:</label>
+      <label for="countryCode" data-i18n="countryCodeLabel">Country Code</label>
       <select id="countryCode">
+        <option value="1">USA/Canada (+1)</option>
+        <option value="44">UK (+44)</option>
         <option value="49">Germany (+49)</option>
-        <option value="44">United Kingdom (+44)</option>
-        <option value="1">United States (+1)</option>
         <option value="33">France (+33)</option>
         <option value="39">Italy (+39)</option>
         <option value="34">Spain (+34)</option>
@@ -125,357 +308,36 @@
         <option value="32">Belgium (+32)</option>
         <option value="41">Switzerland (+41)</option>
         <option value="43">Austria (+43)</option>
+        <option value="45">Denmark (+45)</option>
+        <option value="46">Sweden (+46)</option>
+        <option value="47">Norway (+47)</option>
+        <option value="358">Finland (+358)</option>
+        <option value="48">Poland (+48)</option>
+        <option value="420">Czech Republic (+420)</option>
+        <option value="36">Hungary (+36)</option>
+        <option value="40">Romania (+40)</option>
+        <option value="30">Greece (+30)</option>
+        <option value="351">Portugal (+351)</option>
+        <option value="90">Turkey (+90)</option>
+        <option value="7">Russia (+7)</option>
+        <option value="81">Japan (+81)</option>
+        <option value="82">South Korea (+82)</option>
+        <option value="86">China (+86)</option>
+        <option value="91">India (+91)</option>
+        <option value="61">Australia (+61)</option>
+        <option value="64">New Zealand (+64)</option>
+        <option value="55">Brazil (+55)</option>
+        <option value="54">Argentina (+54)</option>
+        <option value="52">Mexico (+52)</option>
+        <option value="27">South Africa (+27)</option>
       </select>
     </div>
-    <button onclick="saveSettings()" data-i18n="saveSettings">Save Settings</button>
   </div>
 
-  <h1 data-i18n="title">WhatsApp Link Generator</h1>
-  <div id="installPrompt" data-i18n="install">Install as App</div>
-  <input id="phone" type="tel" data-i18n-placeholder="phonePlaceholder" placeholder="e.g. 01711234567" />
-  <br />
-  <button onclick="openWhatsApp()" data-i18n="openWhatsApp">Open in WhatsApp</button>
-  <button onclick="pickContact()" data-i18n="pickContact">Select Contact</button>
+  <div id="settingsOverlay"></div>
   <div id="status"></div>
+  <div id="installPrompt" data-i18n="installPrompt">Install App</div>
 
-  <script>
-    // Translations
-    const translations = {
-      en: {
-        title: "WhatsApp Link Generator",
-        install: "Install as App",
-        phonePlaceholder: "e.g. 01711234567",
-        openWhatsApp: "Open in WhatsApp",
-        pickContact: "Select Contact",
-        online: "Online",
-        offline: "Offline - App running from cache",
-        updateAvailable: "A new version is available. Update now?",
-        contactPickerNotSupported: "Your browser doesn't support the Contact Picker API.",
-        noValidContact: "No valid contact selected.",
-        contactAccessDenied: "Contact access denied or cancelled.",
-        settings: "Settings",
-        defaultCountryCode: "Default Country Code:",
-        saveSettings: "Save Settings",
-        settingsSaved: "Settings saved successfully!",
-        update: "Update Now",
-        updateAvailable: "A new version is available!"
-      },
-      de: {
-        title: "WhatsApp Link Generator",
-        install: "Als App installieren",
-        phonePlaceholder: "z. B. 01711234567",
-        openWhatsApp: "In WhatsApp öffnen",
-        pickContact: "Kontakt auswählen",
-        online: "Online",
-        offline: "Offline - App läuft im Cache",
-        updateAvailable: "Eine neue Version ist verfügbar. Jetzt aktualisieren?",
-        contactPickerNotSupported: "Dein Browser unterstützt das Contact Picker API leider nicht.",
-        noValidContact: "Kein gültiger Kontakt ausgewählt.",
-        contactAccessDenied: "Zugriff auf Kontakte verweigert oder abgebrochen.",
-        settings: "Einstellungen",
-        defaultCountryCode: "Standardvorwahl:",
-        saveSettings: "Einstellungen speichern",
-        settingsSaved: "Einstellungen erfolgreich gespeichert!",
-        update: "Jetzt aktualisieren",
-        updateAvailable: "Eine neue Version ist verfügbar!"
-      }
-    };
-
-    // Settings management
-    function getDefaultCountryCode() {
-      // Map of language codes to country codes
-      const countryCodeMap = {
-        'de': '49',    // Germany
-        'en-GB': '44', // United Kingdom
-        'en-US': '1',  // United States
-        'fr': '33',    // France
-        'it': '39',    // Italy
-        'es': '34',    // Spain
-        'nl': '31',    // Netherlands
-        'be': '32',    // Belgium
-        'de-CH': '41', // Switzerland
-        'de-AT': '43', // Austria
-        'en': '44',    // Default to UK for generic English
-      };
-
-      // Try to get the most specific locale first
-      const locale = navigator.language || navigator.userLanguage;
-      const language = locale.split('-')[0];
-      const region = locale.split('-')[1];
-
-      // Try exact match first (e.g., 'de-DE')
-      if (countryCodeMap[locale]) {
-        return countryCodeMap[locale];
-      }
-      
-      // Try language-region match (e.g., 'de-AT')
-      if (region && countryCodeMap[`${language}-${region}`]) {
-        return countryCodeMap[`${language}-${region}`];
-      }
-      
-      // Try language only (e.g., 'de')
-      if (countryCodeMap[language]) {
-        return countryCodeMap[language];
-      }
-
-      // Default to Germany if no match found
-      return '49';
-    }
-
-    function loadSettings() {
-      const savedSettings = localStorage.getItem('settings');
-      if (savedSettings) {
-        const settings = JSON.parse(savedSettings);
-        document.getElementById('countryCode').value = settings.countryCode;
-        return settings;
-      } else {
-        // First time setup - detect country code
-        const defaultCountryCode = getDefaultCountryCode();
-        const settings = { countryCode: defaultCountryCode };
-        localStorage.setItem('settings', JSON.stringify(settings));
-        document.getElementById('countryCode').value = defaultCountryCode;
-        return settings;
-      }
-    }
-
-    function saveSettings() {
-      const settings = {
-        countryCode: document.getElementById('countryCode').value
-      };
-      localStorage.setItem('settings', JSON.stringify(settings));
-      closeSettings();
-      const lang = document.documentElement.lang;
-      alert(translations[lang].settingsSaved);
-    }
-
-    function openSettings() {
-      console.log('Opening settings...');
-      const overlay = document.getElementById('settingsOverlay');
-      const panel = document.getElementById('settingsPanel');
-      
-      if (overlay && panel) {
-        overlay.style.display = 'block';
-        panel.style.display = 'block';
-        console.log('Settings panel opened');
-      } else {
-        console.error('Settings elements not found:', { overlay, panel });
-      }
-    }
-
-    function closeSettings() {
-      console.log('Closing settings...');
-      const overlay = document.getElementById('settingsOverlay');
-      const panel = document.getElementById('settingsPanel');
-      
-      if (overlay && panel) {
-        overlay.style.display = 'none';
-        panel.style.display = 'none';
-        console.log('Settings panel closed');
-      }
-    }
-
-    // Language detection and initialization
-    function getBrowserLanguage() {
-      const lang = navigator.language || navigator.userLanguage;
-      return lang.startsWith('de') ? 'de' : 'en';
-    }
-
-    function setLanguage(lang) {
-      document.documentElement.lang = lang;
-      document.querySelector('#languageSelector').value = lang;
-      
-      // Update all elements with data-i18n attribute
-      document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        if (translations[lang][key]) {
-          element.textContent = translations[lang][key];
-        }
-      });
-
-      // Update all elements with data-i18n-placeholder attribute
-      document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-        const key = element.getAttribute('data-i18n-placeholder');
-        if (translations[lang][key]) {
-          element.placeholder = translations[lang][key];
-        }
-      });
-
-      // Update status text
-      updateOnlineStatus();
-    }
-
-    function changeLanguage(lang) {
-      setLanguage(lang);
-      localStorage.setItem('preferredLanguage', lang);
-    }
-
-    // Initialize language and settings
-    const savedLanguage = localStorage.getItem('preferredLanguage');
-    setLanguage(savedLanguage || getBrowserLanguage());
-    const settings = loadSettings();
-
-    // Event Listeners
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM Content Loaded');
-      const settingsOverlay = document.getElementById('settingsOverlay');
-      if (settingsOverlay) {
-        console.log('Settings overlay found, adding click listener');
-        settingsOverlay.addEventListener('click', closeSettings);
-      } else {
-        console.error('Settings overlay not found');
-      }
-    });
-
-    // PWA installation handling
-    let deferredPrompt;
-    const installPrompt = document.getElementById('installPrompt');
-    
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installPrompt.style.display = 'block';
-    });
-    
-    installPrompt.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          installPrompt.style.display = 'none';
-        }
-        deferredPrompt = null;
-      }
-    });
-    
-    // Offline status detection
-    const status = document.getElementById('status');
-    function updateOnlineStatus() {
-      const lang = document.documentElement.lang;
-      status.textContent = navigator.onLine ? translations[lang].online : translations[lang].offline;
-      status.style.background = navigator.onLine ? '#25D366' : '#ff9800';
-      status.style.color = 'white';
-    }
-    
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-    updateOnlineStatus();
-    
-    // Service Worker registration with version check
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(registration => {
-          console.log('ServiceWorker registration successful');
-          
-          // Check for updates every hour
-          setInterval(() => {
-            registration.update();
-          }, 60 * 60 * 1000);
-
-          // Handle updates
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                const lang = document.documentElement.lang;
-                const updateMessage = document.createElement('div');
-                updateMessage.style.cssText = `
-                  position: fixed;
-                  bottom: 1em;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  background: #25D366;
-                  color: white;
-                  padding: 1em;
-                  border-radius: 0.5em;
-                  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                  z-index: 1000;
-                  display: flex;
-                  align-items: center;
-                  gap: 1em;
-                `;
-                
-                const message = document.createElement('span');
-                message.textContent = translations[lang].updateAvailable;
-                
-                const updateButton = document.createElement('button');
-                updateButton.textContent = translations[lang].update;
-                updateButton.style.cssText = `
-                  background: white;
-                  color: #25D366;
-                  border: none;
-                  padding: 0.5em 1em;
-                  border-radius: 0.3em;
-                  cursor: pointer;
-                  font-weight: bold;
-                `;
-                updateButton.onclick = () => {
-                  window.location.reload();
-                };
-                
-                const closeButton = document.createElement('button');
-                closeButton.textContent = '×';
-                closeButton.style.cssText = `
-                  background: none;
-                  border: none;
-                  color: white;
-                  font-size: 1.5em;
-                  cursor: pointer;
-                  padding: 0 0.5em;
-                `;
-                closeButton.onclick = () => {
-                  document.body.removeChild(updateMessage);
-                };
-                
-                updateMessage.appendChild(message);
-                updateMessage.appendChild(updateButton);
-                updateMessage.appendChild(closeButton);
-                document.body.appendChild(updateMessage);
-              }
-            });
-          });
-        })
-        .catch(error => {
-          console.error('ServiceWorker registration failed:', error);
-        });
-    }
-
-    function openWhatsApp() {
-      let phone = document.getElementById('phone').value.trim();
-      phone = phone.replace(/^\+|^00/, '');
-
-      const settings = loadSettings();
-      if (!phone.startsWith(settings.countryCode)) {
-        if (phone.startsWith('0')) {
-          phone = phone.substring(1);
-        }
-        phone = settings.countryCode + phone;
-      }
-
-      const url = "https://wa.me/" + encodeURIComponent(phone);
-      window.location.href = url;
-    }
-
-    async function pickContact() {
-      const lang = document.documentElement.lang;
-      
-      if (!('contacts' in navigator && 'ContactsManager' in window)) {
-        alert(translations[lang].contactPickerNotSupported);
-        return;
-      }
-
-      try {
-        const props = ['name', 'tel'];
-        const opts = { multiple: false };
-        const contacts = await navigator.contacts.select(props, opts);
-        if (contacts.length > 0 && contacts[0].tel.length > 0) {
-          document.getElementById('phone').value = contacts[0].tel[0];
-        } else {
-          alert(translations[lang].noValidContact);
-        }
-      } catch (err) {
-        alert(translations[lang].contactAccessDenied);
-      }
-    }
-  </script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
