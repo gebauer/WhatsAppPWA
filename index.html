@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#25D366" />
+  <meta name="description" content="Generate WhatsApp chat links easily" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="WA Generator" />
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+  <title data-i18n="title">WhatsApp Link Generator</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png" />
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      /* Light theme (default) */
+      --primary-color: #25D366;
+      --primary-dark: #128C7E;
+      --primary-light: #DCF8C6;
+      --text-on-primary: white;
+      --surface-color: white;
+      --background-color: #f5f5f5;
+      --text-color: #333;
+      --text-secondary: #666;
+      --border-color: #ddd;
+      --error-color: #B00020;
+      --success-color: #4CAF50;
+      --elevation-1: 0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.14), 0 1px 3px 0 rgba(0,0,0,0.12);
+      --elevation-2: 0 3px 3px -2px rgba(0,0,0,0.2), 0 3px 4px 0 rgba(0,0,0,0.14), 0 1px 8px 0 rgba(0,0,0,0.12);
+      --elevation-3: 0 3px 5px -1px rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12);
+      --overlay-color: rgba(0, 0, 0, 0.5);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary-color: #25D366;
+        --primary-dark: #128C7E;
+        --primary-light: #1a3a2e;
+        --text-on-primary: white;
+        --surface-color: #1e1e1e;
+        --background-color: #121212;
+        --text-color: #e0e0e0;
+        --text-secondary: #a0a0a0;
+        --border-color: #333;
+        --error-color: #CF6679;
+        --success-color: #81C784;
+        --elevation-1: 0 2px 1px -1px rgba(0,0,0,0.4), 0 1px 1px 0 rgba(0,0,0,0.28), 0 1px 3px 0 rgba(0,0,0,0.24);
+        --elevation-2: 0 3px 3px -2px rgba(0,0,0,0.4), 0 3px 4px 0 rgba(0,0,0,0.28), 0 1px 8px 0 rgba(0,0,0,0.24);
+        --elevation-3: 0 3px 5px -1px rgba(0,0,0,0.4), 0 6px 10px 0 rgba(0,0,0,0.28), 0 1px 18px 0 rgba(0,0,0,0.24);
+        --overlay-color: rgba(0, 0, 0, 0.7);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--background-color);
+      min-height: 100vh;
+      padding: 1rem;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: var(--surface-color);
+      border-radius: 8px;
+      box-shadow: var(--elevation-1);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 2rem;
+      font-size: 2rem;
+      font-weight: 500;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+      background-color: var(--surface-color);
+      color: var(--text-color);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: var(--text-on-primary);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      margin: 0.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s ease;
+      text-transform: uppercase;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    #settingsButton {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      background: none;
+      color: var(--primary-color);
+      font-size: 1.5rem;
+      padding: 0.5rem;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    #settingsButton:hover {
+      background-color: var(--primary-light);
+    }
+
+    #languageSelector {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: auto;
+      padding: 0.5rem;
+      border-radius: 4px;
+      background-color: var(--surface-color);
+      color: var(--text-color);
+      box-shadow: var(--elevation-1);
+      border: 1px solid var(--border-color);
+    }
+
+    #settingsPanel {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--surface-color);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: var(--elevation-3);
+      z-index: 1000;
+      min-width: 300px;
+      transition: background-color 0.3s ease;
+    }
+
+    #settingsOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--overlay-color);
+      z-index: 999;
+      backdrop-filter: blur(2px);
+    }
+
+    .settings-row {
+      margin: 1.5rem 0;
+    }
+
+    .settings-row label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+      font-weight: 500;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-button:hover {
+      background-color: var(--primary-light);
+    }
+
+    #status {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      box-shadow: var(--elevation-1);
+      transition: all 0.3s ease;
+      background-color: var(--surface-color);
+      color: var(--text-color);
+    }
+
+    #installPrompt {
+      display: none;
+      margin: 1rem auto;
+      padding: 1rem;
+      background: var(--primary-color);
+      color: var(--text-on-primary);
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: var(--elevation-1);
+      text-align: center;
+      max-width: 300px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 1rem;
+        padding: 1rem;
+      }
+
+      button {
+        width: 100%;
+        margin: 0.5rem 0;
+      }
+
+      #settingsPanel {
+        width: 90%;
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="settingsButton" title="Settings">⚙️</button>
+  <select id="languageSelector">
+    <option value="en">English</option>
+    <option value="de">Deutsch</option>
+  </select>
+
+  <div class="container">
+    <h1 data-i18n="title">WhatsApp Link Generator</h1>
+    
+    <div class="input-group">
+      <label for="phoneNumber" data-i18n="phoneLabel">Phone Number</label>
+      <input type="tel" id="phoneNumber" placeholder="1234567890" autocomplete="tel">
+      <div id="phoneError" class="error"></div>
+    </div>
+
+    <div class="button-group">
+      <button id="generateButton" class="primary-button" onclick="openWhatsApp()">
+        <span data-i18n="generateButton">Open in WhatsApp</span>
+      </button>
+      <button id="copyButton" class="secondary-button" onclick="selectContact()">
+        <span data-i18n="copyButton">Select Contact</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="settingsPanel">
+    <h2 data-i18n="settingsTitle">Settings</h2>
+    <button class="close-button" title="Close">×</button>
+    
+    <div class="settings-row">
+      <label for="countryCode" data-i18n="countryCodeLabel">Country Code</label>
+      <select id="countryCode">
+        <option value="1">USA/Canada (+1)</option>
+        <option value="44">UK (+44)</option>
+        <option value="49">Germany (+49)</option>
+        <option value="33">France (+33)</option>
+        <option value="39">Italy (+39)</option>
+        <option value="34">Spain (+34)</option>
+        <option value="31">Netherlands (+31)</option>
+        <option value="32">Belgium (+32)</option>
+        <option value="41">Switzerland (+41)</option>
+        <option value="43">Austria (+43)</option>
+        <option value="45">Denmark (+45)</option>
+        <option value="46">Sweden (+46)</option>
+        <option value="47">Norway (+47)</option>
+        <option value="358">Finland (+358)</option>
+        <option value="48">Poland (+48)</option>
+        <option value="420">Czech Republic (+420)</option>
+        <option value="36">Hungary (+36)</option>
+        <option value="40">Romania (+40)</option>
+        <option value="30">Greece (+30)</option>
+        <option value="351">Portugal (+351)</option>
+        <option value="90">Turkey (+90)</option>
+        <option value="7">Russia (+7)</option>
+        <option value="81">Japan (+81)</option>
+        <option value="82">South Korea (+82)</option>
+        <option value="86">China (+86)</option>
+        <option value="91">India (+91)</option>
+        <option value="61">Australia (+61)</option>
+        <option value="64">New Zealand (+64)</option>
+        <option value="55">Brazil (+55)</option>
+        <option value="54">Argentina (+54)</option>
+        <option value="52">Mexico (+52)</option>
+        <option value="27">South Africa (+27)</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="settingsOverlay"></div>
+  <div id="status"></div>
+  <div id="installPrompt" data-i18n="installPrompt">Install App</div>
+
+  <footer id="app-version" style="text-align:center; font-size:0.9em; color:var(--text-secondary); margin-top:2em;">
+    Version: <span id="version">1.0.9</span> | Commit id: <span id="build">5f2aeee</span>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+  <script>
+    // Update button text based on language
+    function updateButtonText() {
+      const generateButton = document.getElementById('generateButton');
+      const copyButton = document.getElementById('copyButton');
+      
+      if (currentLang === 'de') {
+        generateButton.textContent = 'In WhatsApp öffnen';
+        copyButton.textContent = 'Kontakt auswählen';
+      } else {
+        generateButton.textContent = 'Open in WhatsApp';
+        copyButton.textContent = 'Select Contact';
+      }
+    }
+
+    function openWhatsApp() {
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
+      const countryCode = document.getElementById('countryCode').value;
+      
+      if (!phoneNumber) {
+        showError('phoneError', 'Bitte geben Sie eine Telefonnummer ein');
+        return;
+      }
+      
+      // Remove any non-digit characters from the phone number
+      const cleanNumber = phoneNumber.replace(/\D/g, '');
+      
+      // Construct the WhatsApp URL
+      const whatsappUrl = `https://wa.me/${countryCode}${cleanNumber}`;
+      
+      // Open WhatsApp directly
+      window.open(whatsappUrl, '_blank');
+    }
+
+    function selectContact() {
+        if ('contacts' in navigator && 'ContactsManager' in window) {
+            // Use the Contacts API if available
+            navigator.contacts.select(['tel'], { multiple: false })
+                .then(contacts => {
+                    if (contacts && contacts.length > 0) {
+                        const phoneNumber = contacts[0].tel[0];
+                        document.getElementById('phoneNumber').value = phoneNumber;
+                    }
+                })
+                .catch(err => {
+                    console.error('Error selecting contact:', err);
+                    // Fallback to basic input if Contacts API fails
+                    const input = document.createElement('input');
+                    input.type = 'tel';
+                    input.setAttribute('autocomplete', 'tel');
+                    document.body.appendChild(input);
+                    input.focus();
+                    setTimeout(() => {
+                        document.body.removeChild(input);
+                    }, 100);
+                });
+        } else {
+            // Fallback for browsers that don't support Contacts API
+            const input = document.createElement('input');
+            input.type = 'tel';
+            input.setAttribute('autocomplete', 'tel');
+            document.body.appendChild(input);
+            input.focus();
+            setTimeout(() => {
+                document.body.removeChild(input);
+            }, 100);
+        }
+    }
+  </script>
+</body>
+</html>
