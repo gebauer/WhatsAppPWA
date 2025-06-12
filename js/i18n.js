@@ -2,30 +2,36 @@ const translations = {
   en: {
     title: 'WhatsApp Link Generator',
     phoneLabel: 'Phone Number',
-    generateButton: 'Generate Link',
-    copyButton: 'Copy Link',
+    generateButton: 'Open in WhatsApp',
+    copyButton: 'Select Contact',
     settingsTitle: 'Settings',
     countryCodeLabel: 'Country Code',
+    languageLabel: 'Language',
     closeButton: 'Close',
+    saveButton: 'Save',
     updateAvailable: 'Update Available',
     updateMessage: 'A new version is available. Would you like to update now?',
     updateButton: 'Update Now',
     closeUpdateButton: 'Later',
-    installPrompt: 'Install App'
+    installPrompt: 'Install App',
+    phoneError: 'Please enter a phone number'
   },
   de: {
     title: 'WhatsApp Link Generator',
     phoneLabel: 'Telefonnummer',
-    generateButton: 'Link generieren',
-    copyButton: 'Link kopieren',
+    generateButton: 'In WhatsApp öffnen',
+    copyButton: 'Kontakt auswählen',
     settingsTitle: 'Einstellungen',
     countryCodeLabel: 'Ländervorwahl',
+    languageLabel: 'Sprache',
     closeButton: 'Schließen',
+    saveButton: 'Speichern',
     updateAvailable: 'Update verfügbar',
     updateMessage: 'Eine neue Version ist verfügbar. Möchten Sie jetzt aktualisieren?',
     updateButton: 'Jetzt aktualisieren',
     closeUpdateButton: 'Später',
-    installPrompt: 'App installieren'
+    installPrompt: 'App installieren',
+    phoneError: 'Bitte geben Sie eine Telefonnummer ein'
   }
 };
 

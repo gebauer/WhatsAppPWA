@@ -278,16 +278,21 @@
     <h1 data-i18n="title">WhatsApp Link Generator</h1>
     
     <div class="input-group">
-      <label for="phone" data-i18n="phoneLabel">Phone Number</label>
-      <input type="tel" id="phone" placeholder="e.g. 01711234567">
+      <label for="phoneNumber" data-i18n="phoneLabel">Phone Number</label>
+      <input type="tel" id="phoneNumber" placeholder="1234567890" autocomplete="tel">
+      <div id="phoneError" class="error"></div>
+    </div>
+
+    <div class="input-group">
+      <textarea id="message" placeholder="Optional message" rows="3"></textarea>
     </div>
 
     <div class="button-group">
       <button id="generateButton" class="primary-button" onclick="openWhatsApp()">
-        <span data-i18n="generateButton">In WhatsApp öffnen</span>
+        <span data-i18n="generateButton">Open in WhatsApp</span>
       </button>
       <button id="copyButton" class="secondary-button" onclick="selectContact()">
-        <span data-i18n="copyButton">Kontakt auswählen</span>
+        <span data-i18n="copyButton">Select Contact</span>
       </button>
     </div>
   </div>
@@ -360,7 +365,7 @@
     }
 
     function openWhatsApp() {
-      const phoneNumber = document.getElementById('phone').value.trim();
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
       const message = document.getElementById('message').value.trim();
       const countryCode = document.getElementById('countryCode').value;
       
@@ -400,7 +405,7 @@
       // Add event listener for when a contact is selected
       input.addEventListener('change', function() {
         if (this.value) {
-          document.getElementById('phone').value = this.value;
+          document.getElementById('phoneNumber').value = this.value;
         }
       });
       
