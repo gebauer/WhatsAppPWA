@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#25D366" />
+  <meta name="description" content="Generate WhatsApp chat links easily" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="WA Generator" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
   <title>WhatsApp Link Generator</title>
-  <link rel="manifest" href="manifest.json">
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js');
-    }
-  </script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
   <style>
     body {
       font-family: sans-serif;
@@ -21,16 +25,97 @@
       padding: 0.5em;
       margin: 0.5em;
     }
+    #status {
+      position: fixed;
+      bottom: 1em;
+      right: 1em;
+      padding: 0.5em;
+      border-radius: 0.5em;
+      background: #eee;
+      font-size: 0.8em;
+    }
+    #installPrompt {
+      display: none;
+      margin: 1em;
+      padding: 1em;
+      background: #25D366;
+      color: white;
+      border-radius: 0.5em;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h1>WhatsApp Link Generator</h1>
-  <input id="phone" type="tel" placeholder="z. B. 01711234567" />
+  <div id="installPrompt">Als App installieren</div>
+  <input id="phone" type="tel" placeholder="z. B. 01711234567" />
   <br />
   <button onclick="openWhatsApp()">In WhatsApp öffnen</button>
   <button onclick="pickContact()">Kontakt auswählen</button>
+  <div id="status"></div>
 
   <script>
+    // PWA installation handling
+    let deferredPrompt;
+    const installPrompt = document.getElementById('installPrompt');
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      deferredPrompt = e;
+      // Show the install button
+      installPrompt.style.display = 'block';
+    });
+    
+    installPrompt.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        // Show the install prompt
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          installPrompt.style.display = 'none';
+        }
+        // Clear the deferredPrompt so it can be garbage collected
+        deferredPrompt = null;
+      }
+    });
+    
+    // Offline status detection
+    const status = document.getElementById('status');
+    function updateOnlineStatus() {
+      status.textContent = navigator.onLine ? 'Online' : 'Offline - App läuft im Cache';
+      status.style.background = navigator.onLine ? '#25D366' : '#ff9800';
+      status.style.color = 'white';
+    }
+    
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+    
+    // Service Worker registration with version check
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(registration => {
+          console.log('ServiceWorker registration successful');
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New version available
+                if (confirm('Eine neue Version ist verfügbar. Jetzt aktualisieren?')) {
+                  window.location.reload();
+                }
+              }
+            });
+          });
+        })
+        .catch(error => {
+          console.error('ServiceWorker registration failed:', error);
+        });
+    }
+
     function openWhatsApp() {
       let phone = document.getElementById('phone').value.trim();
       phone = phone.replace(/^\+|^00/, '');
