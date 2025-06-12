@@ -27,6 +27,12 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Update version in package.json
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          npm version $VERSION --no-git-tag-version
+          echo "Updated package.json to version $VERSION"
+
       - name: Install dependencies
         run: npm install
 
